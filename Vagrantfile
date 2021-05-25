@@ -18,18 +18,17 @@ GB=1024
 IP_PREFIX="172.22.22" # vbox virtual bridge
 #IP_PREFIX="172.55.55" # libvirt virtual bridge
 
-NODE_RAM=2048
-MASTER_RAM=4096
+NODE_RAM=8192
+MASTER_RAM=8192
 DISK_SIZE=10*GB
 ADD_DISK_FLAG=false
 
 MACHINES= [
-  { name: "control" , ip: ip(101), primary: true , cpus: 4, mem: 1024      , add_disk: false },
-  { name: "facility", ip: ip(141), primary: false, cpus: 2, mem: 1024      , add_disk: false },
-  { name: "master"  , ip: ip(122), primary: false, cpus: 4, mem: MASTER_RAM, add_disk: ADD_DISK_FLAG, size: DISK_SIZE },
-  { name: "node1"   , ip: ip(131), primary: false, cpus: 4, mem: NODE_RAM  , add_disk: ADD_DISK_FLAG, size: DISK_SIZE },
-  { name: "node2"   , ip: ip(132), primary: false, cpus: 4, mem: NODE_RAM  , add_disk: ADD_DISK_FLAG, size: DISK_SIZE },
-  { name: "node3"   , ip: ip(133), primary: false, cpus: 4, mem: NODE_RAM  , add_disk: ADD_DISK_FLAG, size: DISK_SIZE },
+  { name: "control"    , ip: ip(101), primary: true , cpus: 1, mem: 3072       , add_disk: false },
+  { name: "master"     , ip: ip(122), primary: false, cpus: 4, mem: MASTER_RAM , add_disk: ADD_DISK_FLAG, size: DISK_SIZE },
+  { name: "node1"      , ip: ip(131), primary: false, cpus: 3, mem: NODE_RAM   , add_disk: ADD_DISK_FLAG, size: DISK_SIZE },
+  { name: "node2"      , ip: ip(132), primary: false, cpus: 3, mem: NODE_RAM   , add_disk: ADD_DISK_FLAG, size: DISK_SIZE },
+  { name: "facility"   , ip: ip(133), primary: false, cpus: 2, mem: NODE_RAM   , add_disk: ADD_DISK_FLAG, size: DISK_SIZE },
 ]
 
 ANSIBLE_VARS="ansible/inventory/vars.yml"
@@ -57,7 +56,8 @@ Vagrant.configure("2") do |config|
   # vagrant-hostmanager: Configure /etc/hosts in machines so that they can look up each other
   config.hostmanager.enabled = true
   config.hostmanager.manage_guest = true
-
+  config.ssh.username = "vagrant"
+  config.ssh.password = "vagrant"
   config.vm.provider :libvirt do |libvirt|
     # Avoid "Call to virDomainCreateWithFlags failed: unsupported configuration: host doesn't support invariant TSC" error when using snapshots
     libvirt.cpu_mode = 'host-passthrough'   
